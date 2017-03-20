@@ -47,11 +47,27 @@ def getdata_altafsir_annotated(cfg):
         yield fname, doc
 
 
-def getdata_altafsir_complete():
-    """
+def getdata_altafsir_complete(cfg):
+    """ Read each input file and yield data.
+
+    Args:
+        cfg (namedtuple): configuration data.
+
+    Yields:
+        str, CorpusDoc: filename and data.
 
     """
-    return None
+    # get all selected altafsir files from sources
+    sourcesfnames = util.get_files(cfg.altafsir.ALTAFSIR_SOURCES_PATH)
+
+    data = {fn : json.load(open(fp)) for fp, fn in sourcesfnames}
+
+    for fname, fobj in data.items():
+
+        text_key = cfg.ann.TEXT_KEY_IN if cfg.ann.TEXT_KEY_IN in fobj else cfg.ann.TEXT_KEY_OUT
+        doc = CorpusDoc(fobj[text_key], fobj[cfg.ann.ANNOTATIONS_KEY])
+
+        yield fname, doc
 
 #FIXME not sure if this will be included in the worflow in the end
 #def getdata_hadith_annotated():

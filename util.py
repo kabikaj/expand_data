@@ -51,6 +51,7 @@ class Config():
         MADHAB_META_PATH = None
         TAFSIR_META_PATH = None
         ANNOTATED_OUTDIR = None
+        COMPLETE_OUTDIR = None
 
     class _Annotation:
 
@@ -103,7 +104,7 @@ class Config():
             ConfigParser: Object read from configuration file.
 
         Raise:
-            ValueError: 
+            ValueError: if any error is find in config file.
 
         """
         cfg = ConfigParser(inline_comment_prefixes=('#'), interpolation=ExtendedInterpolation())
@@ -123,7 +124,8 @@ class Config():
             Config.altafsir.ALTAFSIR_ANNOTATED_PATH = cfg.get('altafsir', 'annotated path')
             Config.altafsir.MADHAB_META_PATH = cfg.get('altafsir', 'madhab meta path')
             Config.altafsir.TAFSIR_META_PATH = cfg.get('altafsir', 'tafsir meta path')
-            Config.altafsir.ANNOTATED_OUTDIR = cfg.get('altafsir', 'annotated outdir')            
+            Config.altafsir.ANNOTATED_OUTDIR = cfg.get('altafsir', 'annotated outdir')
+            Config.altafsir.COMPLETE_OUTDIR = cfg.get('altafsir', 'complete outdir')
 
             Config.ann.ANNOTATIONS_KEY = cfg.get('annotation', 'annotations key')
             Config.ann.META_KEY = cfg.get('annotation', 'meta key')

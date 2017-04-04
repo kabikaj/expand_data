@@ -2,10 +2,14 @@
 #
 #    getdata.py
 #
-# 
+# TODO:
+# ----
+#   * check correctness of original|commentary types of text in docs with only one text
 #
-################################
+#######################################################################################
 
+import sys #DEBUG
+import re
 import ujson as json
 
 import util
@@ -22,23 +26,23 @@ def getdata_altafsir_annotated(cfg):
         str, CorpusDoc: filename and data.
 
     """
-    doc = CorpusDoc()
-    
     # get all selected altafsir files from sources
-    sourcesfnames = util.get_files(cfg.altafsir.ALTAFSIR_SOURCES_PATH)
+    sourcesfnames = util.getfiles(cfg.get('altafsir', 'prepared path'))
 
     # get {filename : { hadith : [{ini:int, end:int}, ...], aya = [...], verse = [...] }}
-    sourcesdata = {fn : json.load(open(fp))[cfg.ann.ANNOTATIONS_KEY] for fp, fn in sourcesfnames}
+    sourcesdata = {fn : json.load(open(fpath))[cfg.get('annotation', 'annotations key')] for fpath, fn in sourcesfnames}
     
-    data = ((fn, json.load(open(fp))) for fp, fn in util.get_files(cfg.altafsir.ALTAFSIR_ANNOTATED_PATH))
+    data = ((fn, json.load(open(fpath))) for fpath, fn in util.getfiles(cfg.get('altafsir', 'annotated path')))
 
     for fname, fobj in data:
 
-        doc.text = fobj[cfg.ann.TEXT_KEY_IN]
+        doc = CorpusDoc()
 
-        annotation = {cfg.ann.PERSONS_KEY : fobj[cfg.ann.PERSONS_KEY],
-                      cfg.ann.MOTIVES_KEY : fobj[cfg.ann.MOTIVES_KEY],
-                      cfg.ann.METAMOTIVES_KEY : fobj[cfg.ann.METAMOTIVES_KEY]}
+        doc.text = fobj[cfg.get('annotation', 'text key input')]
+
+        annotation = {cfg.get('annotation', 'persons key') : fobj[cfg.get('annotation', 'persons key')],
+                      cfg.get('annotation', 'motives key') : fobj[cfg.get('annotation', 'motives key')],
+                      cfg.get('annotation', 'metamotives key') : fobj[cfg.get('annotation', 'metamotives key')]}
 
         annotation.update(sourcesdata[fname])
 
@@ -58,29 +62,108 @@ def getdata_altafsir_complete(cfg):
 
     """
     # get all selected altafsir files from sources
-    sourcesfnames = util.get_files(cfg.altafsir.ALTAFSIR_SOURCES_PATH)
+    sourcesfnames = util.getfiles(cfg.get('altafsir', 'sources path'))
 
-    data = {fn : json.load(open(fp)) for fp, fn in sourcesfnames}
+    data = {fn : json.load(open(fpath)) for fpath, fn in sourcesfnames}
 
     for fname, fobj in data.items():
 
-        text_key = cfg.ann.TEXT_KEY_IN if cfg.ann.TEXT_KEY_IN in fobj else cfg.ann.TEXT_KEY_OUT
-        doc = CorpusDoc(fobj[text_key], fobj[cfg.ann.ANNOTATIONS_KEY])
+        text_key = cfg.get('annotation', 'text key input') if cfg.get('annotation', 'text key input') in fobj \
+                   else cfg.get('annotation', 'text key output')
 
-        yield fname, doc
+        yield fname, CorpusDoc(fobj[text_key], fobj[cfg.get('annotation', 'annotations key')])
+
+#DEBUG
+def getdata_test(cfg):
+    """ Read each input file and yield data.
+
+    Args:
+        cfg (namedtuple): configuration data.
+
+    Yields:
+        str, CorpusDoc: filename and data.
+
+    """
+    # get all selected altafsir files from sources
+    sourcesfnames = util.getfiles(cfg.get('test', 'sources path'))
+
+    data = {fn : json.load(open(fpath)) for fpath, fn in sourcesfnames}
+
+    for fname, fobj in data.items():
+
+        text_key = cfg.get('annotation', 'text key input') if cfg.get('annotation', 'text key input') in fobj \
+                   else cfg.get('annotation', 'text key output')
+
+        yield fname, CorpusDoc(fobj[text_key], fobj[cfg.get('annotation', 'annotations key')])
 
 #FIXME not sure if this will be included in the worflow in the end
 #def getdata_hadith_annotated():
 #    return None
 
-def getdata_hadith_complete():
-    """
+def getdata_hadith_complete(cfg):
+    """ Read each input file and yield data.
+
+    Args:
+        cfg (namedtuple): configuration data.
+
+    Yields:
+        str, namedtuple, CorpusDoc, str: filename, ids of metadata, data and (type of) text key.
+            The metadata contains 6 attributes: PIDSTART(str), PIDEND(str) BOOKID(str), CHAPTERID(int),
+            SUBCHAPTERID(int), SECTIONID(int).
 
     """
-    return None
+    fnames = ((fpath, util.parse_hadith_fname(fn), fn)for fpath,fn in util.getfiles(cfg.get('hadith', 'sources path')))
+    
+    for fpath, fmeta, fname in fnames:
 
-def getdata_ocred():
-    """
+        # get only files corresponding to commentaries
+        if re.match(r'^3[3-9]$', fmeta.BOOKID):
 
+            jsonObj = json.load(open(fpath))
+
+            if cfg.get('annotation', 'hadith original key') in jsonObj:
+                yield fname, fmeta, CorpusDoc(jsonObj[cfg.get('annotation', 'hadith original key')], {}), \
+                      cfg.get('annotation', 'hadith original key')
+
+            if cfg.get('annotation', 'hadith commentary key') in jsonObj:
+                yield fname, fmeta, CorpusDoc(jsonObj[cfg.get('annotation', 'hadith commentary key')], {}), \
+                      cfg.get('annotation', 'hadith commentary key')
+
+
+            #if len(jsonObj)==1: #DEBUG
+            #
+            #    if cfg.get('annotation', 'hadith original key') in jsonObj: #DEBUG
+            #        print(cfg.get('annotation', 'hadith original key'), fmeta.BOOKID, fname) #DEBUG
+            #
+            #    elif cfg.get('annotation', 'hadith commentary key') in jsonObj: #DEBUG
+            #        print(cfg.get('annotation', 'hadith original key'), fmeta.BOOKID, fname) #DEBUG
+            #
+            #    else:
+            #        print('0 0 0') #DEBUG
+
+    
+def getdata_ocred(cfg):
+    """ Read each input file and yield data.
+
+   Args:
+        cfg (namedtuple): configuration data.
+
+    Yields:
+        str, CorpusDoc: filename and data.
+        
     """
-    return None
+    sourcesfnames = util.getfiles(cfg.get('ocred', 'annotated path'))
+
+    data = {fn : json.load(open(fpath)) for fpath, fn in sourcesfnames}
+
+    for fname, fobj in data.items():
+
+        doc = CorpusDoc()
+
+        doc.text = fobj[cfg.get('annotation', 'text key input')]
+
+        doc.annotation = {cfg.get('annotation', 'persons key') : fobj[cfg.get('annotation', 'persons key')],
+                          cfg.get('annotation', 'motives key') : fobj[cfg.get('annotation', 'motives key')],
+                          cfg.get('annotation', 'metamotives key') : fobj[cfg.get('annotation', 'metamotives key')]}
+
+        yield fname, doc

@@ -1,0 +1,20 @@
+{
+  "annotation": {
+    "verse": [],
+    "aya": [
+      {
+        "val": "aya 1",
+        "start": 1,
+        "end": 7
+      },
+      {
+        "val": "aya 2",
+        "start": 11,
+        "end": 13
+      } 
+    ],
+    "hadith": []
+  },
+  "text": "ola k   ase,o"
+}
+

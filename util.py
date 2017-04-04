@@ -8,9 +8,13 @@
 
 import os
 import pprint as pp
+from collections import namedtuple
 from configparser import ConfigParser, MissingSectionHeaderError, \
                          ExtendedInterpolation, NoSectionError, NoOptionError
 
+##########################################
+# CLASSES
+##########################################
 
 class CorpusDoc():
     """ Class representig the data model
@@ -38,59 +42,37 @@ class CorpusDoc():
     def __str__(self):
         return "Instance of class CorpusDoc:\n\ntext = %s\n\nannotations =\n%s" % (self.text, pp.pformat(self.annotation))
 
+_HadithMeta = namedtuple('_HadithMeta', ['PIDSTART', 'PIDEND', 'BOOKID', 'CHAPTERID', 'SUBCHAPTERID', 'SECTIONID'])
 
-class Config():
-    """ TODO
+class HadithMeta(_HadithMeta):
+    """ Class to store metadata from hadith filenames.
+
+    Attributes:
+        PIDSTART (int): pid variable for reconstucting url in start position.
+        PIDEND (int): pid variable for reconstucting url in end position.
+        BOOKID (int): book that constains document.
+        CHAPTERID (int): chapter that constains document.
+        SUBCHAPTERID (int): subchapter that constains document.
+        SECTIONID (int): section that constains document.
 
     """
+    def __str__(self):
+        return """Instance of class HadithMeta:\n \
+               PIDSTART = %s\n \
+               PIDEND = %s\n \
+               BOOKID = %s\n \
+               CHAPTERID = %s\n \
+               SUBCHAPTERID = %s\n \
+               SECTIONID = %s\n \
+               """ % (self.PIDSTART,
+                      self.PIDEND,
+                      self.BOOKID,     
+                      self.CHAPTERID,
+                      self.SUBCHAPTERID,
+                      self.SECTIONID)
 
-    class _Altafsir:
-        
-        ALTAFSIR_SOURCES_PATH = None
-        ALTAFSIR_ANNOTATED_PATH = None
-        MADHAB_META_PATH = None
-        TAFSIR_META_PATH = None
-        ANNOTATED_OUTDIR = None
-        COMPLETE_OUTDIR = None
-
-    class _Annotation:
-
-        ANNOTATIONS_KEY = None
-        META_KEY = None
-        TEXT_KEY_IN = None
-        TEXT_KEY_OUT = None
-
-        PERSONS_KEY = None
-        MOTIVES_KEY = None
-        METAMOTIVES_KEY = None
-        TOKENS_KEY = None
-
-        VALUE_KEY = None
-        TOK_KEY = None
-        POS_KEY = None
-        LEMMA_KEY = None
-        ROOT_KEY = None
-
-        SOURCES_INI_KEY = -1
-        INI_KEY = -1
-        END_KEY = -1
-
-    class _Meta:
-
-        MADHAB_NAME = None
-        MADHAB_ID = None
-        TAFSIR_NAME = None
-        TAFSIR_ID = None
-        SURA = None
-        AYA_INI = None 
-        ANA_END = None
-        AUHTOR = None
-        DATE =  None
-        URL =  None
-
-    altafsir = _Altafsir
-    meta = _Meta
-    ann = _Annotation
+class Config():
+    """ Configuration constants. """
 
     def load(cfgpath = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'config.ini'),
              globals = globals()):
@@ -119,51 +101,14 @@ class Config():
         if not cfg.sections():
             raise ValueError('Error in module {__file__}: config file missing or empty'.format(**globals))
     
-        try:
-            Config.altafsir.ALTAFSIR_SOURCES_PATH = cfg.get('altafsir', 'sources path')
-            Config.altafsir.ALTAFSIR_ANNOTATED_PATH = cfg.get('altafsir', 'annotated path')
-            Config.altafsir.MADHAB_META_PATH = cfg.get('altafsir', 'madhab meta path')
-            Config.altafsir.TAFSIR_META_PATH = cfg.get('altafsir', 'tafsir meta path')
-            Config.altafsir.ANNOTATED_OUTDIR = cfg.get('altafsir', 'annotated outdir')
-            Config.altafsir.COMPLETE_OUTDIR = cfg.get('altafsir', 'complete outdir')
-
-            Config.ann.ANNOTATIONS_KEY = cfg.get('annotation', 'annotations key')
-            Config.ann.META_KEY = cfg.get('annotation', 'meta key')
-            Config.ann.TEXT_KEY_IN = cfg.get('annotation', 'text key input')
-            Config.ann.TEXT_KEY_OUT = cfg.get('annotation', 'text key output')
-            Config.ann.PERSONS_KEY = cfg.get('annotation', 'persons key')
-            Config.ann.MOTIVES_KEY = cfg.get('annotation', 'motives key')
-            Config.ann.METAMOTIVES_KEY = cfg.get('annotation', 'metamotives key')
-            Config.ann.TOKENS_KEY = cfg.get('annotation', 'tokens key')
-
-            Config.ann.VALUE_KEY = cfg.get('annotation', 'value key')
-            Config.ann.SOURCES_INI_KEY = cfg.get('annotation', 'sources ini key')
-            Config.ann.INI_KEY = cfg.get('annotation', 'ini key')
-            Config.ann.END_KEY = cfg.get('annotation', 'end key')
-
-            Config.ann.TOK_KEY = cfg.get('annotation', 'tok key')
-            Config.ann.POS_KEY = cfg.get('annotation', 'pos key')
-            Config.ann.LEMMA_KEY = cfg.get('annotation', 'lemma key')
-            Config.ann.ROOT_KEY = cfg.get('annotation', 'root key')
-
-            Config.meta.MADHAB_NAME = cfg.get('altafsir meta', 'madhab name')
-            Config.meta.MADHAB_ID = cfg.get('altafsir meta', 'madhab id')
-            Config.meta.TAFSIR_NAME = cfg.get('altafsir meta', 'tafsir name')
-            Config.meta.TAFSIR_ID = cfg.get('altafsir meta', 'tafsir id')
-            Config.meta.SURA = cfg.get('altafsir meta', 'sura')
-            Config.meta.AYA_INI = cfg.get('altafsir meta', 'aya ini')
-            Config.meta.AYA_END = cfg.get('altafsir meta', 'aya end')
-            Config.meta.AUTHOR = cfg.get('altafsir meta', 'author')
-            Config.meta.DATE = cfg.get('altafsir meta', 'date')
-            Config.meta.URL = cfg.get('altafsir meta', 'url')
-            
-        except (NoSectionError, NoOptionError) as err:
-            raise ValueError('Error in module {__file__}: missing section or option in config file. {err}'.format(**globals, err=err))
+        return cfg
         
-        return Config
 
+##########################################
+# SUBROUTINES
+##########################################
 
-def get_files(path):
+def getfiles(path):
     """ Generate list of file paths and names from directory path.
 
     Args:
@@ -199,3 +144,29 @@ def loadmeta_altafsir(madhab_path, tafsir_path):
         tafsir_mapping = {_id : {'name':name, 'author':author, 'date':date} for _id, name, author, date in lines}
     
     return madhab_mapping, tafsir_mapping
+
+def parse_hadith_fname(fname):
+    """ Extract metadata from fname.
+
+    Example of fname: hadith.al-islam-10904-10907_33-76.json, where
+        PIDSTART = 10904
+        PIDEND = 10907
+        BOOKID = 33
+        CHAPTER = 76
+        SUBCHAPTERID = None
+        SECTION = None
+
+    Args:
+        fname (str): file name to parser.
+
+    Return:
+        namedtuple: metadata.
+
+    """
+    pidrange, _, rest = fname.partition('_')
+    bookid, docmeta = (lambda x: (x[0], list(map(int, x[1:]))))(rest.split('-'))
+    return HadithMeta(*list(map(int, pidrange.rsplit('-',2)[1:])), bookid, *docmeta, *([None]*(3-len(docmeta))))
+
+#FIXME puta madre! antes habia quedado mejor!!
+# metadata = dict(itertools.zip_longest(('pidstart', 'pidend', 'book', 'chapter', 'subchapter', 'section'),
+#                                     itertools.chain(*(i.split('-') for i in fname.split('-',2)[-1].split('_')))))

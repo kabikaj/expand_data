@@ -1,0 +1,41 @@
+{
+  "annotation": {
+    "verse": [
+      {
+        "val": "verse 1",
+        "start": 8,
+        "end": 19
+      } 
+    ],
+    "aya": [
+      {
+        "val": "aya 1",
+        "start": 4,
+        "end": 10
+      },
+      {
+        "val": "aya 2",
+        "start": 17,
+        "end": 25
+      },
+      {
+        "val": "aya 3",
+        "start": 22,
+        "end": 29
+      } 
+    ],
+    "hadith": [
+      {
+        "val": "hadith 1",
+        "start": 0,
+        "end": 9
+      },
+      {
+        "val": "hadith 2",
+        "start": 9,
+        "end": 21
+      }
+    ]
+  },
+  "text": "ola k ase, toKeniSa o k ase?!!"
+}

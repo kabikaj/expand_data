@@ -66,7 +66,7 @@ def tokenise_adjust(cfg, doc, fname):
                     
                 # end of annotation instance
                 if ann[cfg.get('annotation', 'end key')] > tok.ini:
-                    tok_end = i+1 #FIXME check if it is necessary to add one!!
+                    tok_end = i #FIXME check if it is necessary to add one!!
 
             if tok_ini == -1 or tok_end == -1:
                 print("FATAL ERROR: something went wrong adjusting the offsets in file %s. ini=%d end=%d" %
@@ -108,10 +108,10 @@ if __name__ == '__main__':
     
     cfg = Config.load()
 
-    #DEBUG ==== START =================================================================================
     if args.test:
         
         # clean output dir
+        print('cleaning %s ...' % cfg.get('test', 'outdir'), file=sys.stderr) #DEBUG
         for fpath in (f.path for f in os.scandir(cfg.get('test', 'outdir')) if f.is_file()): os.unlink(fpath)
 
         for fname, doc in getdata.getdata_test(cfg):
@@ -125,18 +125,16 @@ if __name__ == '__main__':
             with open(os.path.join(cfg.get('test', 'outdir'), fname+'.json'), 'w') as outfp:
                 json.dump(newdata, outfp, ensure_ascii=False)
         
-        sys.exit()
-    #DEBUG ==== END =================================================================================
-
+        sys.exit(0)
 
     if args.altafsir_annotated or args.altafsir_complete or args.all:
 
         madhab_mapping, tafsir_mapping = util.loadmeta_altafsir(cfg.get('altafsir', 'madhab meta path'), cfg.get('altafsir', 'tafsir meta path'))
-        
 
     if args.altafsir_annotated or args.all:
 
         # clean output dir
+        print('cleaning %s ...' % cfg.get('altafsir', 'annotated outdir'), file=sys.stderr) #DEBUG
         for fpath in (f.path for f in os.scandir(cfg.get('altafsir', 'annotated outdir')) if f.is_file()): os.unlink(fpath)
 
         for fname, doc in getdata.getdata_altafsir_annotated(cfg):
@@ -152,10 +150,10 @@ if __name__ == '__main__':
             with open(os.path.join(cfg.get('altafsir', 'annotated outdir'), fname+'.json'), 'w') as outfp:
                 json.dump(newdata, outfp, ensure_ascii=False)
 
-
     if args.altafsir_complete or args.all:
 
         # clean output dir
+        print('cleaning %s ...' % cfg.get('altafsir', 'complete outdir'), file=sys.stderr) #DEBUG
         for fpath in (f.path for f in os.scandir(cfg.get('altafsir', 'complete outdir')) if f.is_file()): os.unlink(fpath)
         
         for fname, doc in getdata.getdata_altafsir_complete(cfg):
@@ -172,6 +170,7 @@ if __name__ == '__main__':
     if args.hadith_complete or args.all:
 
         # clean output dir
+        print('cleaning %s ...' % cfg.get('hadith', 'complete outdir'), file=sys.stderr) #DEBUG
         for fpath in (f.path for f in os.scandir(cfg.get('hadith', 'complete outdir')) if f.is_file()): os.unlink(fpath)
 
         for fname, fmeta, doc, keytext in getdata.getdata_hadith_complete(cfg):
@@ -187,10 +186,10 @@ if __name__ == '__main__':
                      '{base}_{suf}.{ext}'.format(base=fname, suf=keytext, ext='json')), 'w') as outfp:
                     json.dump(newdata, outfp, ensure_ascii=False)
 
-
     if args.ocred or args.all:
 
         # clean output dir
+        print('cleaning %s ...' % cfg.get('ocred', 'annotated outdir'), file=sys.stderr) #DEBUG
         for fpath in (f.path for f in os.scandir(cfg.get('ocred', 'annotated outdir')) if f.is_file()): os.unlink(fpath)
 
         for fname, doc in getdata.getdata_ocred(cfg):
@@ -206,5 +205,4 @@ if __name__ == '__main__':
 
             except ValueError as e:
                 print('{red}{err} Abort conversion for this file.{reset}'.format(err=e, red=RED, reset=RESET), file=sys.stderr)
-
 

@@ -45,6 +45,9 @@ def getmeta_altafsir(fname, cfg, madhab_mapping, tafsir_mapping):
 
     meta[cfg.get('meta', 'madhab id')] = int(meta[cfg.get('meta', 'madhab id')])
     meta[cfg.get('meta', 'tafsir id')] = int(meta[cfg.get('meta', 'tafsir id')])
+    meta[cfg.get('meta', 'sura')] = int(meta[cfg.get('meta', 'sura')])
+    meta[cfg.get('meta', 'aya ini')] = int(meta[cfg.get('meta', 'aya ini')])
+    meta[cfg.get('meta', 'aya end')] = int(meta[cfg.get('meta', 'aya end')])
 
     return meta
 

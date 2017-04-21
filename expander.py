@@ -2,6 +2,9 @@
 #
 #    expander.py
 #
+# dependencies:
+#   * kabkaj v1.0
+#
 # usage:
 #   python expander.py --all
 #

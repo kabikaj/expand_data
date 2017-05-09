@@ -4,7 +4,22 @@
 #
 # Utility classes
 #
-#############################
+# Copyright 2017 Alicia González Martínez
+# COBHUNI Project, Universität Hamburg
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+##########################################################################
 
 import os
 import pprint as pp
@@ -12,9 +27,9 @@ from collections import namedtuple
 from configparser import ConfigParser, MissingSectionHeaderError, \
                          ExtendedInterpolation, NoSectionError, NoOptionError
 
-##########################################
+#
 # CLASSES
-##########################################
+#
 
 class CorpusDoc():
     """ Class representig the data model
@@ -104,9 +119,9 @@ class Config():
         return cfg
         
 
-##########################################
+#
 # SUBROUTINES
-##########################################
+#
 
 def getfiles(path):
     """ Generate list of file paths and names from directory path.
@@ -167,6 +182,6 @@ def parse_hadith_fname(fname):
     bookid, docmeta = (lambda x: (x[0], list(map(int, x[1:]))))(rest.split('-'))
     return HadithMeta(*list(map(int, pidrange.rsplit('-',2)[1:])), bookid, *docmeta, *([None]*(3-len(docmeta))))
 
-#FIXME puta madre! antes habia quedado mejor!!
+#FIXME jarrrl habia quedado mejor con zip_longest
 # metadata = dict(itertools.zip_longest(('pidstart', 'pidend', 'book', 'chapter', 'subchapter', 'section'),
 #                                     itertools.chain(*(i.split('-') for i in fname.split('-',2)[-1].split('_')))))
